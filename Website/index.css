@@ -37,6 +37,13 @@
     top: 50%;left: 50%;transform: translate(-50%,-50%);
 }
 
+.import {
+    position: absolute;
+    width: 65%;height: 50%;
+    top: 50%;left: 50%;transform: translate(-50%,-50%);
+    border: 4px dashed black;border-radius: 20px;
+}
+
 footer {
     position: relative;
     height: 300px;width: 100%;
