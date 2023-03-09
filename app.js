@@ -13,7 +13,6 @@ const storage = multer.diskStorage({
     extname = path.extname(file.originalname)
   }
 });
-const pythonProcess = spawn('python', ['upscale_color.py']);
 // Initialize upload
 const upload = multer({
   storage: storage
@@ -24,23 +23,27 @@ app.get("/",(req,res) => {
     res.sendFile(path.join(__dirname,"test.html"))
   })
 // Route for uploading picture
-app.post('/upload', (req, res) => {
-  upload(req, res, (err) => {
+app.post('/upload', async(req, res) => {
+  await upload(req, res, (err) => {
     if (err) {
       console.log(err);
     } else {
       console.log(req.file);
-      console.log('Picture uploaded!');
-      res.redirect("http://localhost:5500/runPy")
     }
   });
+  console.log("Uploaded")
+  res.redirect('/');
 });
 
 app.get("/runPy", (req,res) => {
   // const fname = req.params.fname
+  const pythonProcess = spawn('python', ['upscale_color.py']);
   let count = 0;
+  console.log(count)
+  console.log(extname)
   pythonProcess.stdout.on('data', (data) => {
     if (count == 0) {
+      console.log(data.toString())
       res.send(data.toString());
     }
     count++

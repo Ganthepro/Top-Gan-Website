@@ -23,6 +23,17 @@ app.get("/",(req,res) => {
 app.post('/upload', upload.single('image'), function(req, res) {
   console.log('File uploaded successfully!')
   // res.redirect("http://localhost:5500/runPy")
+  fetch('http://localhost:5500/upload', {
+    method: "POST",
+    mode: "no-cors"
+  })
+  .then(response => response.text())
+  .then(data => {
+    console.log(data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
 })
 
 app.get("/runPy", (req, file ,res) => {
