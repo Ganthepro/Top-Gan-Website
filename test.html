@@ -1,86 +1,81 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <title>Drag-and-Drop File Uploader</title>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <title>Picture Upload</title>
     <style>
-        #drop-zone {
-            border: 2px dashed gray;
-            padding: 50px;
-            text-align: center;
-            font-size: 1.5em;
-        }
+      #drop-zone {
+        width: 200px;
+        height: 200px;
+        border: 2px dashed #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        color: #ccc;
+      }
 
-        #drop-zone.hover {
-            background-color: lightgray;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
+      #drop-zone.highlight {
+        background-color: #e6e6e6;
+      }
     </style>
-</head>
-
-<body>
-    <div id="drop-zone">Drop files here</div>
-    <input type="file" id="file-input" multiple>
-    <br><br>
-    <img id="uploaded-image" style="max-width: 300px;">
     <script>
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const uploadedImage = document.getElementById('uploaded-image');
+      const dropZone = document.getElementById('drop-zone');
+      const uploadForm = document.getElementById('upload-form');
+      const pictureInput = document.getElementById('picture-input');
 
-        function handleDrop(e) {
-            e.preventDefault();
-            dropZone.classList.remove('hover');
+      // Prevent default drag behaviors
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
 
-            const files = e.dataTransfer.files;
-            for (let i = 0; i < files.length; i++) {
-                uploadFile(files[i]);
-            }
-        }
+      // Highlight drop zone on drag enter
+      dropZone.addEventListener('dragenter', highlight, false);
+      dropZone.addEventListener('dragover', highlight, false);
 
-        function handleDragOver(e) {
-            e.preventDefault();
-            dropZone.classList.add('hover');
-        }
+      // Unhighlight drop zone on drag leave
+      dropZone.addEventListener('dragleave', unhighlight, false);
+      document.body.addEventListener('drop', unhighlight, false);
 
-        function handleDragLeave(e) {
-            e.preventDefault();
-            dropZone.classList.remove('hover');
-        }
+      // Handle dropped files
+      dropZone.addEventListener('drop', handleDrop, false);
 
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            for (let i = 0; i < files.length; i++) {
-                uploadFile(files[i]);
-            }
-        }
+      // Prevent default drag behaviors
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
 
-        async function uploadFile(file) {
-            const imageURL = URL.createObjectURL(file);
-            await fetch('http://localhost:5500/runPy', {
-                    method: "GET",
-                    mode: "no-cors"
-            })
-            .then(response => response.text())
-            .then(data => {
-              console.log(data);
-            })
-            .catch(error => {
-              console.error(error);
-            });
-            uploadedImage.setAttribute('src', imageURL);
-        }
-        dropZone.addEventListener('drop', handleDrop);
-        dropZone.addEventListener('dragover', handleDragOver);
-        dropZone.addEventListener('dragleave', handleDragLeave);
-        fileInput.addEventListener('change', handleFileSelect);
+      // Highlight drop zone on drag enter
+      function highlight(e) {
+        dropZone.classList.add('highlight');
+      }
+
+      // Unhighlight drop zone on drag leave
+      function unhighlight(e) {
+        dropZone.classList.remove('highlight');
+      }
+
+      // Handle dropped files
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        handleFiles(files);
+      }
+
+      // Update file input field with dropped files
+      function handleFiles(files) {
+        pictureInput.files = files;
+      }
     </script>
-</body>
-
+  </head>
+  <body>
+    <h1>Upload a Picture</h1>
+    <div id="drop-zone">Drop picture here</div>
+    <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+      <input id="picture-input" type="file" name="picture">
+      <button type="submit">Upload</button>
+    </form>
+  </body>
 </html>
