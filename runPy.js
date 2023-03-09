@@ -12,22 +12,24 @@ app.get("/",(req,res) => {
 
 app.get("/runPy", (req, res) => {
   // const fname = req.params.fname
-  let output
-  pythonProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-    output = data
-  });
-  
-  pythonProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-    output = data
-  });
-  
-  pythonProcess.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-  });
-  pythonProcess.stdin.write("1.png" + "\n")
-  res.send(output)
+  let count = 0;
+  try {
+    pythonProcess.stdout.on('data', (data) => {
+      if (count == 0) {
+        res.send(data.toString());
+      }
+      count++
+    });
+    
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+    
+    pythonProcess.on('close', (code) => {
+      console.log(`child process exited with code ${code}`);
+    })
+    pythonProcess.stdin.write("6.tif" + "\n")
+  } catch {}
 })
 
 app.listen(5500, () => console.log('Server running on port 5500'));
